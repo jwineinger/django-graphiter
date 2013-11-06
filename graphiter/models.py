@@ -15,8 +15,17 @@ class Page(models.Model):
 	slug = models.SlugField()
 	charts = models.ManyToManyField(Chart)
 
-	time_from = models.CharField(max_length=50, default=u"-24h")
-	time_until = models.CharField(max_length=50, default=u"", blank=True)
+	time_from = models.CharField(
+		max_length=50,
+		default=u"-24h",
+		help_text=u"The default 'from' parameter to use for all charts on this page. Can be overridden via GET param when viewing the Page.",
+	)
+	time_until = models.CharField(
+		max_length=50,
+		default=u"", 
+		blank=True,
+		help_text=u"The default 'until' parameter to use for all charts on this page. Can be overridden via GET param when viewing this Page.",
+	)
 
 	image_width = models.PositiveIntegerField(default=1200)
 	image_height = models.PositiveIntegerField(default=400)
@@ -25,4 +34,4 @@ class Page(models.Model):
 		return self.title
 		
 	def get_absolute_url(self):
-	    return reverse('page_detail', kwargs={'slug': self.slug})
+		return reverse('page_detail', kwargs={'slug': self.slug})
