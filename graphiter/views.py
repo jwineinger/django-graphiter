@@ -26,9 +26,16 @@ class PageDetailView(DetailView):
 			parsed = urlparse.urlparse(chart.url)
 			qs = urlparse.parse_qs(parsed.query)
 
-			qs['from'] = self.request.GET['from'] if 'from' in self.request.GET else (obj.time_from if obj.time_from else qs['from'])
-			qs['until'] = self.request.GET['until'] if 'until' in self.request.GET else (obj.time_until if obj.time_until else qs['until'])
-
+			if 'from' in self.request.GET:
+				qs['from'] = self.request.GET['from']
+			elif obj.time_from:
+				qs['from'] = obj.time_from
+				
+			if 'until' in self.request.GET:
+				qs['until'] = self.request.GET['until']
+			elif obj.time_until:
+				qs['until'] = obj.time_until
+				
 			qs['width'] = obj.image_width if obj.image_width else qs.get('width', self.DEFAULT_WIDTH)
 			qs['height'] = obj.image_height if obj.image_height else qs.get('height', self.DEFAULT_HEIGHT)
 
