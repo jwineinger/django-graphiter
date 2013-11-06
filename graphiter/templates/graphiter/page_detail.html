@@ -2,14 +2,30 @@
 <html>
 <head>
     <title>{{ page.title }}</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" type="text/javascript"></script>
 </head>
 <body>
 
     <h1>{{ page.title }}</h1>
 
+    <div id="chart_imgs">
     {% for chart in page.charts_cache %}
         <img src="{{ chart.mangled_url|safe }}">
     {% endfor %}
+    </div>
 
+<script type="text/javascript">
+    function refresh_imgs(){
+        $("#chart_imgs img").each(function(idx, img){
+            img = $(img);
+            var url = img.attr('src').replace(/&cachebuster.*$/, '') + '&cachebuster=' + new Date().getTime()
+            img.attr('src', url);
+            console.log(url);
+        });
+    }
+    $(function(){
+        setInterval("refresh_imgs()", 10000)
+    });
+</script>
 </body>
 </html>
