@@ -10,7 +10,7 @@ setup(
     name = 'django-graphiter',
     version = '1.0',
     packages = ['graphiter'],
-    package_data = {'graphiter': ['graphiter/templates/*'] },
+    package_data = {'graphiter': ['graphiter/templates/graphiter/*html'] },
     license = 'BSD License',
     description = 'Django app to store graphite chart URLs, combine them into pages, and adjust time frames via GET param.',
     long_description = README,
