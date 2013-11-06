@@ -15,7 +15,7 @@ class Page(models.Model):
 	charts = models.ManyToManyField(Chart)
 
 	time_from = models.CharField(max_length=50, default=u"-24h")
-	time_until = models.CharField(max_length=50, default=u"")
+	time_until = models.CharField(max_length=50, default=u"", blank=True)
 
 	image_width = models.PositiveIntegerField(default=1200)
 	image_height = models.PositiveIntegerField(default=400)
