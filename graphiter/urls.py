@@ -2,7 +2,7 @@ from django.conf.urls import patterns, url
 from django.views.generic import RedirectView
 from django.core.urlresolvers import reverse_lazy
 
-from charts.views import PageListView, PageDetailView
+from .views import PageListView, PageDetailView
 
 
 urlpatterns = patterns('',
