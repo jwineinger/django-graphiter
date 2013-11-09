@@ -33,10 +33,10 @@
     <h1>{{ page.title }}</h1>
 
     <div id="chart_imgs">
-    {% for chart in page.charts_cache %}
+    {% for chart_url in page.charts_cache %}
         <div class="chart">
             <span class="line"></span>
-            <img src="{{ chart.mangled_url|safe }}">
+            <img src="{{ chart_url|safe }}">
         </div>
     {% endfor %}
     </div>
