@@ -9,7 +9,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 setup(
     name='django-graphiter',
     version='1.0',
-    requires=["Django<1.6", "pytz"],
+    requires=["Django<1.6", "pytz", "requests==2.0.1"],
     packages=['graphiter'],
     package_data={'graphiter': ['templates/graphiter/*html'] },
     license='BSD License',
