@@ -20,7 +20,7 @@ class PageDetailView(DetailView):
 		context = super(PageDetailView, self).get_context_data(**kwargs)
 
 		obj = context[self.context_object_name]
-		obj.charts_cache = obj.get_charts_for_display(
+		context['charts'] = obj.get_charts_for_display(
 			time_from=self.request.GET.get('from'),
 			time_until=self.request.GET.get('until'),
 		)

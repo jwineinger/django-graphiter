@@ -73,7 +73,7 @@ class Page(models.Model):
 		return title_to
 
 	def get_charts_for_display(self, time_from=None, time_until=None):
-		_chart_urls = []
+		_charts = []
 		for page_chart in self.pagecharts.all().order_by("position").select_related('chart'):
 			chart = page_chart.chart
 
@@ -90,9 +90,10 @@ class Page(models.Model):
 			elif self.time_until:
 				qs['until'] = self.time_until
 
+			title_from = self.get_from_timerange(qs, page_chart.time_from)
+			title_to = self.get_to_timerange(qs, page_chart.time_until)
+
 			if chart.override_chart_title:
-				title_from = self.get_from_timerange(qs, page_chart.time_from)
-				title_to = self.get_to_timerange(qs, page_chart.time_until)
 				qs['title'] = "{title} ({tfrom} to {tto})".format(title=chart.title, tfrom=title_from, tto=title_to)
 
 			qs['width'] = self.image_width if self.image_width else qs.get('width', settings.DEFAULT_CHART_WIDTH)
@@ -100,8 +101,11 @@ class Page(models.Model):
 
 			parts = list(parsed)
 			parts[4] = urllib.urlencode(qs, doseq=True)
-			_chart_urls.append(urlparse.urlunparse(parts))
-		return _chart_urls
+			_charts.append({
+				'url': urlparse.urlunparse(parts),
+				'time_range': "{tfrom}{tto}".format(tfrom=title_from, tto=title_to).replace(" ", ""),
+			})
+		return _charts
 
 
 class PageChart(models.Model):

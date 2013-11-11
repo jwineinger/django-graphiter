@@ -33,10 +33,10 @@
     <h1>{{ page.title }}</h1>
 
     <div id="chart_imgs">
-    {% for chart_url in page.charts_cache %}
-        <div class="chart">
+    {% for chart_def in charts %}
+        <div class="chart" data-group="{{ chart_def.time_range }}">
             <span class="line"></span>
-            <img src="{{ chart_url|safe }}">
+            <img src="{{ chart_def.url|safe }}">
         </div>
     {% endfor %}
     </div>
@@ -52,14 +52,16 @@
     $(function(){
         setInterval("refresh_imgs()", 10000);
 
-        var lines = $(".line");
+        function get_lines(el) {
+            return $(".chart[data-group='" + el.attr('data-group') + "'] .line");
+        }
 
         $(document.body).on("mouseenter", ".chart", function(evt){
-            lines.addClass("active");
+            get_lines($(this)).addClass("active");
         }).on("mouseleave", ".chart", function(evt){
-            lines.removeClass("active");
+            get_lines($(this)).removeClass("active");
         }).on("mousemove", ".chart", function(evt){
-            lines.each(function(line){
+            get_lines($(this)).each(function(line){
                 $(this).css({left: evt.offsetX + "px"});
             });
         });
