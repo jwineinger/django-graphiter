@@ -7,6 +7,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from .attime import parseTimeOffset
+from utils import seconds_to_other
 
 
 class Chart(models.Model):
@@ -45,6 +46,32 @@ class Page(models.Model):
 	def get_absolute_url(self):
 		return reverse('page_detail', kwargs={'slug': self.slug})
 
+	def get_from_timerange(self, qs, time_from):
+		_seconds = parseTimeOffset(qs['from']) if 'from' in qs else timedelta(seconds=0)
+
+		if time_from:
+			extra_delta = parseTimeOffset(time_from)
+			_seconds += extra_delta
+
+		qs['from'] = '%dseconds' % _seconds.total_seconds()
+		return "{range} ago".format(range=seconds_to_other(-int(_seconds.total_seconds())))
+
+	def get_to_timerange(self, qs, time_until):
+		_seconds = parseTimeOffset(qs['until'] if 'until' in qs else timedelta(seconds=0))
+
+		if time_until:
+			extra_delta = parseTimeOffset(time_until)
+			_seconds += extra_delta
+
+		qs['until'] = '%dseconds' % _seconds.total_seconds()
+		title_to = seconds_to_other(-int(_seconds.total_seconds()))
+
+		if int(_seconds.total_seconds()) == 0:
+			del qs['until']
+			title_to = "now"
+
+		return title_to
+
 	def get_charts_for_display(self, time_from=None, time_until=None):
 		_chart_urls = []
 		for page_chart in self.pagecharts.all().order_by("position").select_related('chart'):
@@ -63,20 +90,10 @@ class Page(models.Model):
 			elif self.time_until:
 				qs['until'] = self.time_until
 
-			if page_chart.time_from:
-				start_delta = parseTimeOffset(qs['from']) if 'from' in qs else timedelta(seconds=0)
-				extra_delta = parseTimeOffset(page_chart.time_from)
-				_seconds = start_delta + extra_delta
-				qs['from'] = '%dseconds' % _seconds.total_seconds()
-
-			if page_chart.time_until:
-				start_delta = parseTimeOffset(qs['until'] if 'until' in qs else timedelta(seconds=0))
-				extra_delta = parseTimeOffset(page_chart.time_until)
-				_seconds = start_delta + extra_delta
-				qs['until'] = '%dseconds' % _seconds.total_seconds()
-
 			if chart.override_chart_title:
-				qs['title'] = chart.title
+				title_from = self.get_from_timerange(qs, page_chart.time_from)
+				title_to = self.get_to_timerange(qs, page_chart.time_until)
+				qs['title'] = "{title} ({tfrom} to {tto})".format(title=chart.title, tfrom=title_from, tto=title_to)
 
 			qs['width'] = self.image_width if self.image_width else qs.get('width', settings.DEFAULT_CHART_WIDTH)
 			qs['height'] = self.image_height if self.image_height else qs.get('height', settings.DEFAULT_CHART_HEIGHT)

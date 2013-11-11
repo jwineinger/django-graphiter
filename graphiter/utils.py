@@ -1,29 +1,26 @@
-import pytz
-from django.conf import settings
+CHUNKS = (
+	(60 * 60 * 24 * 365, 'y'),
+	(60 * 60 * 24 * 30, 'mon'),
+	(60 * 60 * 24 * 7, 'w'),
+	(60 * 60 * 24, 'd'),
+	(60 * 60, 'h'),
+	(60, 'min'),
+	(1, 's'),
+)
 
-from .attime import parseATTime
 
+def seconds_to_other(sec):
+	"""
+	Converts an integer number of seconds to a string of comma separted
+	shorthand labels. Largest unit used is year; the smallest is second.
 
-def get_times(from_time=None, until_time=None, timezone=None):
-	tzinfo = pytz.timezone(settings.TIME_ZONE)
-	if timezone:
-		try:
-			tzinfo = pytz.timezone(timezone)
-		except pytz.UnknownTimeZoneError:
-			pass
+	Example output: "8h, 5min, 2s"
+	"""
+	chunks = []
+	remainder = sec
+	for chunk_secs, label in CHUNKS:
+		num, remainder = divmod(remainder, chunk_secs)
+		if num:
+			chunks.append(u"{count}{label}".format(count=num, label=label))
 
-	if until_time:
-		_until = parseATTime(until_time, tzinfo)
-	else:
-		_until = parseATTime('now', tzinfo)
-
-	if from_time:
-		_from = parseATTime(from_time, tzinfo)
-	else:
-		_from = parseATTime('-1d', tzinfo)
-
-	_start = min(_from, _until)
-	_end = max(_from, _until)
-	assert _start != _end, "Invalid empty time range"
-
-	return _start, _end
+	return ", ".join(chunks)
