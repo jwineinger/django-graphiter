@@ -62,7 +62,8 @@
             get_lines($(this)).removeClass("active");
         }).on("mousemove", ".chart", function(evt){
             get_lines($(this)).each(function(line){
-                $(this).css({left: evt.offsetX + "px"});
+                var offX = (evt.offsetX || evt.clientX - $(evt.target).offset().left);
+                $(this).css({left: offX + "px"});
             });
         });
     });
